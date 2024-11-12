@@ -242,32 +242,32 @@ function classification()
     $result_conf_matrix['key'] = $highest_accuracy_key;
 
     $hasil_jurusan_rekomendasi = getJurusanByID($highest_accuracy_key);
+
+    $j_pilihan = getJurusanByID($jurusan_pilihan);
     // result
     $result = [
         'status' => 'success',
         'nilai_k' => $k,
-        'jurusan_pilihan' => $jurusan,
+        'jurusan_pilihan' => $j_pilihan,
         'jurusan_rekomendasi' => $majority_class,
         'jumlah_kelas_mayoritas' => $majority_count,
         'akurasi_tertinggi' => $highest_accuracy,
+        'key_tertinggi' => $highest_accuracy_key,
         'hasil_jurusan_rekomendasi' => $hasil_jurusan_rekomendasi,
         'confussion_matrix' => confussionMatrix()
     ];
 
-
-    // dummy 
-    $akurasi = 80;
-
-    $status = saveData($nama, $jurusan_pilihan, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok, $fis, $jw, $jurusan_rekomendasi, $akurasi);
+    $status = saveData($nama, $jurusan_pilihan, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok, $fis, $jw, $highest_accuracy_key, $highest_accuracy);
+    // echo json_encode($j_pilihan);
     echo $status ? json_encode($result) : json_encode(['status' => 'failed']);
 }
 
-function saveData($nama, $jurusan_pilihan, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok, $fis, $jw, $hasil, $akurasi)
+function saveData($nama, $jurusan_pilihan, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok, $fis, $jw, $highest_accuracy_key, $highest_accuracy)
 {
     global $conn;
 
     $sql = mysqli_query($conn, "INSERT INTO klasifikasi ( nama, id_jurusan, pai, bi, mtk, sej, bing, senbud, ok, fis, bj, hasil, akurasi)
-    VALUES ('$nama', '$jurusan_pilihan', '$pai', '$bi', '$mtk', '$sej', '$bing', '$senbud', '$ok', '$fis', '$jw', '$hasil', '$akurasi')");
+    VALUES ('$nama', '$jurusan_pilihan', '$pai', '$bi', '$mtk', '$sej', '$bing', '$senbud', '$ok', '$fis', '$jw', '$highest_accuracy_key', '$highest_accuracy')");
 
     return $sql ? true : false;
 }
@@ -308,9 +308,10 @@ function confussionMatrix()
 {
     global $conn;
     // get all data testing
-    $getData = mysqli_query($conn, "SELECT id_klasifikasi, nama, pai, klasifikasi.id_jurusan as id_jurusan_aktual, klasifikasi.hasil as id_jurusan_prediksi, bi, mtk, sej, bing, senbud, ok, fis, bj, hasil, akurasi, a.jurusan as jurusan_pilihan, b.jurusan as jurusan_rekomendasi FROM klasifikasi
-                                    JOIN jurusan as a ON klasifikasi.id_jurusan = a.id_jurusan
-                                    JOIN jurusan as b ON klasifikasi.id_jurusan = b.id_jurusan");
+    $getData = mysqli_query($conn, "SELECT id_data_testing, nama, pai, data_testing.id_jurusan as id_jurusan_aktual, data_testing.hasil as id_jurusan_prediksi, bi, mtk, sej, bing, senbud, ok, fis, bj, hasil, a.jurusan as jurusan_pilihan, b.jurusan as jurusan_rekomendasi 
+                                    FROM data_testing
+                                    JOIN jurusan as a ON data_testing.id_jurusan = a.id_jurusan
+                                    JOIN jurusan as b ON data_testing.id_jurusan = b.id_jurusan");
 
     // get all data jurusan
     $getJurusan = mysqli_query($conn, "SELECT * FROM jurusan");
@@ -321,7 +322,7 @@ function confussionMatrix()
 
     foreach ($getData as $key => $val) {
         $data[] = [
-            "id_klasifikasi" => $val['id_klasifikasi'],
+            "id_data_testing" => $val['id_data_testing'],
             "id_jurusan" => $val['id_jurusan_aktual'],
             "hasil" => $val['id_jurusan_prediksi']
         ];
