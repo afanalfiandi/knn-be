@@ -1,6 +1,10 @@
 <?php
 header("Access-Control-Allow-Origin: *");
 header('Content-Type: application/json');
+require '../vendor/autoload.php';
+
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 include 'conn.php';
 $act = $_GET['act'];
@@ -20,6 +24,15 @@ switch ($act) {
         break;
     case 'getRiwayat':
         getRiwayat();
+        break;
+    case 'onDeleteAll':
+        onDeleteAll();
+        break;
+    case 'onDeleteById':
+        onDeleteById();
+        break;
+    case 'onExport':
+        onExport();
         break;
     default:
         login();
@@ -653,6 +666,7 @@ function getRiwayat()
     $data = [];
     foreach ($sql as $key => $val) {
         $data[] = [
+            'id_klasifikasi' => $val['id_klasifikasi'],
             'nama' => $val['nama'],
             'pai' => $val['pai'],
             'bi' => $val['bi'],
@@ -672,4 +686,92 @@ function getRiwayat()
 
     echo json_encode($data);
     return ($data);
+}
+
+function onDeleteAll()
+{
+    global $conn;
+
+    $sql = mysqli_query($conn, "DELETE FROM klasifikasi");
+
+    if ($sql) {
+        $sql2 = mysqli_query($conn, "DELETE FROM data_testing WHERE id_data_testing > 312");
+
+        echo json_encode(['message' => 'success']);
+    } else {
+        echo json_encode(['message' => 'failed']);
+    }
+}
+
+function onExport()
+{
+    global $conn;
+
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+
+    $sheet->setCellValue('A1', 'No');
+    $sheet->setCellValue('B1', 'Nama');
+    $sheet->setCellValue('C1', 'Jurusan');
+    $sheet->setCellValue('D1', 'PAI');
+    $sheet->setCellValue('E1', 'Bahasa Indonesia');
+    $sheet->setCellValue('F1', 'Matematika');
+    $sheet->setCellValue('G1', 'Sejarah');
+    $sheet->setCellValue('H1', 'Bahasa Inggris');
+    $sheet->setCellValue('I1', 'Seni Budaya');
+    $sheet->setCellValue('J1', 'Olahraga & Keterampilan');
+    $sheet->setCellValue('K1', 'Fisika');
+    $sheet->setCellValue('L1', 'Bahasa Jawa');
+    $sheet->setCellValue('M1', 'Prediksi Jurusan');
+
+    $data = mysqli_query($conn, "SELECT id_klasifikasi, nama, pai, klasifikasi.id_jurusan as id_jurusan_aktual, klasifikasi.hasil as id_jurusan_prediksi, 
+            bi, mtk, sej, bing, senbud, ok, fis, jw, hasil, akurasi, a.jurusan as jurusan_pilihan, b.jurusan as jurusan_rekomendasi 
+            FROM klasifikasi
+            JOIN jurusan as a ON klasifikasi.id_jurusan = a.id_jurusan
+            JOIN jurusan as b ON klasifikasi.id_jurusan = b.id_jurusan");
+    $i = 2;
+    $no = 1;
+    while ($d = mysqli_fetch_array($data)) {
+        $sheet->setCellValue('A' . $i, $no++);
+        $sheet->setCellValue('B' . $i, $d['nama']);
+        $sheet->setCellValue('C' . $i, $d['jurusan_pilihan']);
+        $sheet->setCellValue('D' . $i, $d['pai']);
+        $sheet->setCellValue('E' . $i, $d['bi']);
+        $sheet->setCellValue('F' . $i, $d['mtk']);
+        $sheet->setCellValue('G' . $i, $d['sej']);
+        $sheet->setCellValue('H' . $i, $d['bing']);
+        $sheet->setCellValue('I' . $i, $d['senbud']);
+        $sheet->setCellValue('J' . $i, $d['ok']);
+        $sheet->setCellValue('K' . $i, $d['fis']);
+        $sheet->setCellValue('L' . $i, $d['jw']);
+        $sheet->setCellValue('M' . $i, $d['jurusan_rekomendasi']);
+        $i++;
+    }
+
+    // $writer = new Xlsx($spreadsheet);
+    // $writer->save('Data riwayat.xlsx');
+
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment; filename="data_riwayat_rekomendasi.xls"');
+    header('Cache-Control: max-age=0');
+
+    // Menulis file ke output stream
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output'); // Mengirim file ke browser
+    $conn->close();
+}
+
+function onDeleteById()
+{
+    global $conn;
+
+    $id = $_GET['id'];
+
+    $sql = mysqli_query($conn, "DELETE FROM klasifikasi WHERE id_klasifikasi = '$id'");
+
+    if ($sql) {
+        echo json_encode(['message' => 'success']);
+    } else {
+        echo json_encode(['message' => 'failed']);
+    }
 }

@@ -8,7 +8,7 @@ JOIN jurusan as b ON klasifikasi.id_jurusan = b.id_jurusan");
 // get all data jurusan
 $getJurusan = mysqli_query($conn, "SELECT * FROM jurusan");
 
-$data = []; `// untuk data testing
+$data = []; // untuk data testing
 $all_classes = []; // untuk data jurusan, define as class
 $confusion_matrix = []; // conf matrix as array
 
