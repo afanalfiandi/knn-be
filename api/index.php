@@ -657,11 +657,31 @@ function getRiwayat()
 {
     global $conn;
 
-    $sql = mysqli_query($conn, "SELECT id_klasifikasi, nama, pai, klasifikasi.id_jurusan as id_jurusan_aktual, klasifikasi.hasil as id_jurusan_prediksi, bi, mtk, sej, bing, senbud, ok, fis, jw, hasil, akurasi, a.jurusan as jurusan_pilihan, b.jurusan as jurusan_rekomendasi FROM klasifikasi
-                                JOIN jurusan as a ON klasifikasi.id_jurusan = a.id_jurusan
-                                JOIN jurusan as b ON klasifikasi.id_jurusan = b.id_jurusan
-                                ORDER BY id_klasifikasi DESC
-                                ");
+    $sql = mysqli_query($conn, "SELECT 
+    id_klasifikasi, 
+    nama, 
+    pai, 
+    klasifikasi.id_jurusan AS id_jurusan_aktual, 
+    klasifikasi.hasil AS id_jurusan_prediksi, 
+    bi, 
+    mtk, 
+    sej, 
+    bing, 
+    senbud, 
+    ok, 
+    fis, 
+    jw, 
+    hasil, 
+    a.jurusan AS jurusan_pilihan, 
+    b.jurusan AS jurusan_rekomendasi
+FROM 
+    klasifikasi
+JOIN 
+    jurusan AS a ON klasifikasi.id_jurusan = a.id_jurusan
+JOIN 
+    jurusan AS b ON klasifikasi.hasil = b.id_jurusan
+ORDER BY 
+    id_klasifikasi DESC");
 
     $data = [];
     foreach ($sql as $key => $val) {
@@ -724,11 +744,29 @@ function onExport()
     $sheet->setCellValue('L1', 'Bahasa Jawa');
     $sheet->setCellValue('M1', 'Prediksi Jurusan');
 
-    $data = mysqli_query($conn, "SELECT id_klasifikasi, nama, pai, klasifikasi.id_jurusan as id_jurusan_aktual, klasifikasi.hasil as id_jurusan_prediksi, 
-            bi, mtk, sej, bing, senbud, ok, fis, jw, hasil, akurasi, a.jurusan as jurusan_pilihan, b.jurusan as jurusan_rekomendasi 
-            FROM klasifikasi
-            JOIN jurusan as a ON klasifikasi.id_jurusan = a.id_jurusan
-            JOIN jurusan as b ON klasifikasi.id_jurusan = b.id_jurusan");
+    $data = mysqli_query($conn, "SELECT 
+    id_klasifikasi, 
+    nama, 
+    pai, 
+    klasifikasi.id_jurusan AS id_jurusan_aktual, 
+    klasifikasi.hasil AS id_jurusan_prediksi, 
+    bi, 
+    mtk, 
+    sej, 
+    bing, 
+    senbud, 
+    ok, 
+    fis, 
+    jw, 
+    hasil, 
+    a.jurusan AS jurusan_pilihan, 
+    b.jurusan AS jurusan_rekomendasi
+FROM 
+    klasifikasi
+JOIN 
+    jurusan AS a ON klasifikasi.id_jurusan = a.id_jurusan
+JOIN 
+    jurusan AS b ON klasifikasi.hasil = b.id_jurusan");
     $i = 2;
     $no = 1;
     while ($d = mysqli_fetch_array($data)) {
