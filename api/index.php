@@ -216,11 +216,11 @@ function onUpload()
                 'jurusan' => $test['jurusan_pilihan'],
                 'predicted_jurusan_id' => $predicted_jurusan_id,
                 'predicted_jurusan' => $predicted_jurusan_name,
-                'confusion_matrix' => $confusion_matrix[$predicted_jurusan_id],
-                'accuracy' => $metrics['accuracy'],
-                'precision' => $metrics['precision'],
-                'recall' => $metrics['recall'],
-                'f1_score' => $metrics['f1_score']
+                // 'confusion_matrix' => $confusion_matrix[$predicted_jurusan_id],
+                // 'accuracy' => $metrics['accuracy'],
+                // 'precision' => $metrics['precision'],
+                // 'recall' => $metrics['recall'],
+                // 'f1_score' => $metrics['f1_score']
             ];
         }
 
@@ -288,9 +288,9 @@ function onUpload()
         }
         echo json_encode([
             'classification_results' => $classification_results,
-            'confusion_matrix' => $confusion_matrix,
-            'metrics_per_class' => $metrics_per_class,
-            'aggregate_metrics' => $aggregate_metrics
+            // 'confusion_matrix' => $confusion_matrix,
+            // 'metrics_per_class' => $metrics_per_class,
+            // 'aggregate_metrics' => $aggregate_metrics
         ], JSON_PRETTY_PRINT);
     }
 }
@@ -586,8 +586,8 @@ function getCalculationResult($nama, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok,
             'id_jurusan' => $test['id_jurusan_pilihan'],
             'jurusan' => $test['jurusan_pilihan'],
             'predicted_jurusan_id' => $predicted_jurusan_id,
-            'predicted_jurusan' => $predicted_jurusan_name,
-            'confusion_matrix' => $confusion_matrix[$predicted_jurusan_id] // Tambahkan hasil perhitungan untuk kelas yang diprediksi
+            'predicted_jurusan' => $predicted_jurusan_name
+            // 'confusion_matrix' => $confusion_matrix[$predicted_jurusan_id]
         ];
     }
 
@@ -638,7 +638,7 @@ function getCalculationResult($nama, $pai, $bi, $mtk, $sej, $bing, $senbud, $ok,
     echo json_encode([
         'classification_results' => $classification_results,
         'confusion_matrix' => $confusion_matrix,
-        'metrics_per_class' => $metrics_per_class,
+        // 'metrics_per_class' => $metrics_per_class,
         'aggregate_metrics' => $aggregate_metrics
     ], JSON_PRETTY_PRINT);
 }
@@ -698,7 +698,7 @@ ORDER BY
             'fis' => $val['fis'],
             'jw' => $val['jw'],
             'hasil' => $val['hasil'],
-            'akurasi' => $val['akurasi'],
+            // 'akurasi' => $val['akurasi'],
             'jurusan_pilihan' => $val['jurusan_pilihan'],
             'jurusan_rekomendasi' => $val['jurusan_rekomendasi']
         ];
